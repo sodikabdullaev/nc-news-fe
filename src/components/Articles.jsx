@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState } from 'react'
 import { getArticles } from '../api'
 import Breadcrumb from './Breadcrumb'
 
@@ -56,9 +56,7 @@ function Articles() {
 						Search
 					</button>
 				</div>
-				<Suspense fallback={<p>Loading todos...</p>}>
-					<ArticlesList />
-				</Suspense>
+				<ArticlesList />
 			</div>
 		</div>
 	)
@@ -109,27 +107,9 @@ function ArticlesList() {
 								{article.title}
 							</a>
 						</h3>
-						<p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
-							description
+						<p className="text-gray-600">
+							Author: <a href="#">{article.author}</a>
 						</p>
-					</div>
-					<div className="relative mt-8 flex items-center gap-x-4">
-						{/* <img
-                    src={post.author.imageUrl}
-                    alt=""
-                    className="h-10 w-10 rounded-full bg-gray-50"
-                />
-                <div className="text-sm leading-6">
-                    <p className="font-semibold text-gray-900">
-                        <a href={post.author.href}>
-                            <span className="absolute inset-0" />
-                            {post.author.name}
-                        </a>
-                    </p>
-                    <p className="text-gray-600">
-                        {post.author.role}
-                    </p>
-                </div> */}
 					</div>
 				</article>
 			))}
