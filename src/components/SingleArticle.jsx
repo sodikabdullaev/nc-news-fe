@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getArticleById } from '../api'
-import {
-	CloudArrowUpIcon,
-	LockClosedIcon,
-	ServerIcon,
-} from '@heroicons/react/20/solid'
 import Breadcrumb from './Breadcrumb'
+import Comments from './Comments'
 
 function SingleArticle() {
 	const { article_id } = useParams()
@@ -44,6 +40,7 @@ function SingleArticle() {
 						<article>{article.body}</article>
 					</div>
 				</div>
+				<Comments article_id={article_id} />
 			</div>
 		</div>
 	)
