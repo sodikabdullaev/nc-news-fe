@@ -35,3 +35,8 @@ export function addComment(article_id, comment) {
 			return data.comment
 		})
 }
+export function deleteComment(comment_id) {
+	return newsApi.delete(`/comments/${comment_id}`).then(() => {
+		return true
+	})
+}
