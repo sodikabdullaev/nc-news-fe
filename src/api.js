@@ -23,3 +23,15 @@ export function voteArticle(body, article_id) {
 		return data.article
 	})
 }
+export function getUsers() {
+	return newsApi.get('/users').then(({ data }) => {
+		return data.users
+	})
+}
+export function addComment(article_id, comment) {
+	return newsApi
+		.post(`/articles/${article_id}/comments`, comment)
+		.then(({ data }) => {
+			return data.comment
+		})
+}
