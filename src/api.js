@@ -18,3 +18,8 @@ export function getComments(article_id) {
 		return data.comments
 	})
 }
+export function voteArticle(body, article_id) {
+	return newsApi.patch(`/articles/${article_id}`, body).then(({ data }) => {
+		return data.article
+	})
+}
