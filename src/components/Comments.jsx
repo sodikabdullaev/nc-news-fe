@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react'
-import { getComments } from '../api'
+import { useEffect, useState, useContext } from 'react'
+import { addComment, getComments } from '../api'
+import clsx from 'clsx'
+import ActiveUserContext from '../context/UserContext'
 function Comments({ article_id }) {
 	const [comments, setComments] = useState([])
+	const [newComment, setNewComment] = useState('')
+	const [isLoading, setIsloading] = useState(true)
+	const [isCommenting, setIsCommenting] = useState(false)
+	const { activeUser } = useContext(ActiveUserContext)
+
 	useEffect(() => {
 		getComments(article_id).then((data) => {
 			setComments(data)
+			setIsloading(false)
 		})
 	}, [])
 	const months = [
@@ -21,6 +29,22 @@ function Comments({ article_id }) {
 		'Nov',
 		'Dec',
 	]
+	function handleSubmit(event) {
+		event.preventDefault()
+		setIsCommenting(true)
+		if (newComment.length >= 5) {
+			addComment(article_id, {
+				body: newComment,
+				author: activeUser.username,
+			}).then((data) => {
+				setComments((currValue) => {
+					return [data, ...currValue]
+				})
+				setIsCommenting(false)
+				setNewComment('')
+			})
+		}
+	}
 	function getFullDate(date) {
 		const commentedAt = new Date(date)
 		return `${commentedAt.getDate()} ${
@@ -30,19 +54,28 @@ function Comments({ article_id }) {
 	return (
 		<>
 			<h2>Comments</h2>
+			{isLoading && 'Loading ...'}
 			<form className=" bg-white rounded-2xl border border-blue-500 p-2 mx-auto mt-20 ">
 				<div className="px-3 mb-2 mt-2">
 					<textarea
-						placeholder="comment"
+						placeholder="your comment"
+						required
+						value={newComment}
+						onChange={(event) => setNewComment(event.target.value)}
 						className="w-full bg-gray-100 rounded border border-gray-400 leading-normal resize-none h-20 py-2 px-3 font-medium placeholder-gray-700 focus:outline-none focus:bg-white"
 					></textarea>
 				</div>
 				<div className="flex justify-end px-4">
-					<input
-						type="submit"
-						className="px-2.5 py-1.5 rounded-md text-white text-sm bg-indigo-500"
-						value="Comment"
-					/>
+					<button
+						className={clsx(
+							(newComment.length < 5 || isCommenting === true) &&
+								'cursor-not-allowed opacity-50',
+							'px-2.5 py-1.5 rounded-md text-white text-sm bg-indigo-500'
+						)}
+						onClick={handleSubmit}
+					>
+						Comment
+					</button>
 				</div>
 			</form>
 			<ul>
