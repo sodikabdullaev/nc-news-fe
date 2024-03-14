@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react'
-import { getArticles } from '../api'
+import { useEffect, useState, Fragment } from 'react'
+import { getArticles, getTopics } from '../api'
 import Breadcrumb from './Breadcrumb'
+import { Listbox, Transition } from '@headlessui/react'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { useSearchParams } from 'react-router-dom'
 
 const crumbs = [
 	{
@@ -8,8 +11,17 @@ const crumbs = [
 		link: '',
 	},
 ]
+const sortByList = [
+	{ title: 'Date', value: 'created_at' },
+	{ title: 'Title', value: 'title' },
+	{ title: 'Topic', value: 'topic' },
+	{ title: 'Author', value: 'author' },
+]
+const orderByList = ['desc', 'asc']
 function Articles() {
-	const [searchTerm, setSearchTerm] = useState('')
+	const [selectedSort, setSelectedSort] = useState(sortByList[0])
+	const [selectedOrder, setSelectedOrder] = useState(orderByList[0])
+	const [isLoading, setIsLoading] = useState(false)
 
 	return (
 		<div className="bg-white py-4">
@@ -20,57 +32,164 @@ function Articles() {
 						Latest news
 					</h2>
 				</div>
-				<div className="relative">
-					<div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-						<svg
-							className="w-4 h-4 text-gray-500 dark:text-gray-400"
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 20 20"
+				<div className="flex flex-row">
+					<div className="w-1/2 px-3">
+						Sort:
+						<Listbox
+							value={selectedSort}
+							onChange={setSelectedSort}
 						>
-							<path
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-							/>
-						</svg>
+							<div className="relative mt-1">
+								<Listbox.Button className="relative block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-500 rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+									<span className="block truncate">
+										{selectedSort.title}
+									</span>
+									<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+										<ChevronUpDownIcon
+											className="h-5 w-5 text-gray-400"
+											aria-hidden="true"
+										/>
+									</span>
+								</Listbox.Button>
+								<Transition
+									as={Fragment}
+									leave="transition ease-in duration-100"
+									leaveFrom="opacity-100"
+									leaveTo="opacity-0"
+								>
+									<Listbox.Options className=" mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+										{sortByList.map((item, index) => (
+											<Listbox.Option
+												key={index}
+												className={({ active }) =>
+													`relative cursor-default select-none py-2 pl-10 pr-4 ${
+														active
+															? 'bg-amber-100 text-amber-900'
+															: 'text-gray-900'
+													}`
+												}
+												value={item}
+											>
+												{({ selectedSort }) => (
+													<>
+														<span
+															className={`block truncate ${
+																selectedSort
+																	? 'font-medium'
+																	: 'font-normal'
+															}`}
+														>
+															{item.title}
+														</span>
+														{selectedSort ? (
+															<span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+																<CheckIcon
+																	className="h-5 w-5"
+																	aria-hidden="true"
+																/>
+															</span>
+														) : null}
+													</>
+												)}
+											</Listbox.Option>
+										))}
+									</Listbox.Options>
+								</Transition>
+							</div>
+						</Listbox>
 					</div>
-					<input
-						type="search"
-						value={searchTerm}
-						onChange={(event) => {
-							setSearchTerm(event.target.value)
-						}}
-						id="default-search"
-						className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-500 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-						placeholder="Search item"
-						required
-					/>
-					<button
-						type="button"
-						className="text-white absolute end-2.5 bottom-2.5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 md:px-10 py-2"
-					>
-						Search
-					</button>
+					<div className="w-1/2 px-3">
+						Order:
+						<Listbox
+							value={selectedOrder}
+							onChange={setSelectedOrder}
+						>
+							<div className="relative mt-1">
+								<Listbox.Button className="relative block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-500 rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+									<span className="block truncate">
+										{selectedOrder}
+									</span>
+									<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+										<ChevronUpDownIcon
+											className="h-5 w-5 text-gray-400"
+											aria-hidden="true"
+										/>
+									</span>
+								</Listbox.Button>
+								<Transition
+									as={Fragment}
+									leave="transition ease-in duration-100"
+									leaveFrom="opacity-100"
+									leaveTo="opacity-0"
+								>
+									<Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+										{orderByList.map((item, index) => (
+											<Listbox.Option
+												key={index}
+												className={({ active }) =>
+													`relative cursor-default select-none py-2 pl-10 pr-4 ${
+														active
+															? 'bg-amber-100 text-amber-900'
+															: 'text-gray-900'
+													}`
+												}
+												value={item}
+											>
+												{({ selectedOrder }) => (
+													<>
+														<span
+															className={`block truncate ${
+																selectedOrder
+																	? 'font-medium'
+																	: 'font-normal'
+															}`}
+														>
+															{item}
+														</span>
+														{selectedOrder ? (
+															<span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+																<CheckIcon
+																	className="h-5 w-5"
+																	aria-hidden="true"
+																/>
+															</span>
+														) : null}
+													</>
+												)}
+											</Listbox.Option>
+										))}
+									</Listbox.Options>
+								</Transition>
+							</div>
+						</Listbox>
+					</div>
 				</div>
-				<ArticlesList />
+
+				<ArticlesList
+					selectedSort={selectedSort}
+					selectedOrder={selectedOrder}
+				/>
 			</div>
 		</div>
 	)
 }
-function ArticlesList() {
+function ArticlesList({ selectedSort, selectedOrder }) {
 	const [articles, setArticles] = useState([])
 	const [isLoading, setIsLoading] = useState(true)
+	let [searchParams, setSearchParams] = useSearchParams()
 
 	useEffect(() => {
-		getArticles().then((data) => {
-			setArticles(data)
-			setIsLoading(false)
-		})
-	}, [])
+		console.log(selectedOrder)
+		getArticles({ sort_by: selectedSort.value, order: selectedOrder }).then(
+			(data) => {
+				setArticles(data)
+				setIsLoading(false)
+				setSearchParams(
+					`order_by=${selectedSort.value}&order=${selectedOrder}`
+				)
+			}
+		)
+	}, [selectedSort, selectedOrder])
 	return (
 		<div className="mx-auto mt-2 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200  sm:mt-6 sm:pt-6 lg:mx-0 lg:max-w-none lg:grid-cols-3">
 			{isLoading && <Loading />}
