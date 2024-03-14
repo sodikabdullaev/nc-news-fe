@@ -7,6 +7,7 @@ import SingleArticle from './components/SingleArticle'
 import ActiveUserContext from './context/UserContext'
 import { useState } from 'react'
 import Users from './components/Users'
+import ArticlesByTopic from './components/ArticlesByTopic'
 function App() {
 	const [activeUser, setActiveUser] = useState(
 		JSON.parse(localStorage.getItem('user'))
@@ -18,6 +19,10 @@ function App() {
 				<Routes>
 					<Route path="/" element={<Home />} />
 					<Route path="/articles" element={<Articles />} />
+					<Route
+						path="/topics/:topic"
+						element={<ArticlesByTopic />}
+					/>
 					<Route
 						path="/articles/:article_id"
 						element={<SingleArticle />}

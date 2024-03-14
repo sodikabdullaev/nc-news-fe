@@ -12,6 +12,7 @@ function Comments({ article_id }) {
 	const { activeUser } = useContext(ActiveUserContext)
 	const [commmentToDelete, setCommmentToDelete] = useState(null)
 	const [isOpen, setIsOpen] = useState(false)
+	const [errors, setErrors] = useState([])
 
 	function closeModal() {
 		setIsOpen(false)
@@ -43,17 +44,27 @@ function Comments({ article_id }) {
 	function handleSubmit(event) {
 		event.preventDefault()
 		setIsCommenting(true)
-		if (newComment.length >= 5) {
-			addComment(article_id, {
-				body: newComment,
-				author: activeUser.username,
-			}).then((data) => {
-				setComments((currValue) => {
-					return [data, ...currValue]
+		if (activeUser) {
+			if (newComment.length >= 5) {
+				addComment(article_id, {
+					body: newComment,
+					author: activeUser.username,
+				}).then((data) => {
+					setComments((currValue) => {
+						return [data, ...currValue]
+					})
+					setIsCommenting(false)
+					setNewComment('')
+					setErrors([])
 				})
-				setIsCommenting(false)
-				setNewComment('')
-			})
+			} else
+				setErrors([
+					`Please enter at least 5 characters to leave a comment`,
+				])
+			setIsCommenting(false)
+		} else {
+			setErrors([`You need to login to leave a comment`])
+			setIsCommenting(false)
 		}
 	}
 	function handleDeleteComment() {
@@ -79,6 +90,14 @@ function Comments({ article_id }) {
 			<h2>Comments</h2>
 			{isLoading && 'Loading ...'}
 			<form className=" bg-white rounded-2xl border border-blue-500 p-2 mx-auto mt-20 ">
+				{errors.map((error, index) => (
+					<p
+						key={index}
+						className="bg-red-50 py-1 px-2 rounded-md text-red-700"
+					>
+						{error}
+					</p>
+				))}
 				<div className="px-3 mb-2 mt-2">
 					<textarea
 						placeholder="your comment"
@@ -97,7 +116,7 @@ function Comments({ article_id }) {
 						)}
 						onClick={handleSubmit}
 					>
-						Comment
+						{isCommenting ? 'Commenting ... ' : 'Comment'}
 					</button>
 				</div>
 			</form>
@@ -177,34 +196,35 @@ function Comments({ article_id }) {
 									</svg>
 									{comment.votes < 0 && comment.votes}
 								</button>
-								{comment.author === activeUser.username && (
-									<button
-										type="button"
-										onClick={() => {
-											setCommmentToDelete(
-												comment.comment_id
-											)
-											openModal()
-										}}
-										className="inline-flex items-center mr-2 mb-1 rounded-md bg-pink-50 px-2 py-1 text-xs font-medium text-pink-700 ring-1 ring-inset ring-pink-700/10"
-									>
-										Delete
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 24 24"
-											strokeWidth={1.5}
-											stroke="currentColor"
-											className="w-6 h-6"
+								{activeUser &&
+									comment.author === activeUser.username && (
+										<button
+											type="button"
+											onClick={() => {
+												setCommmentToDelete(
+													comment.comment_id
+												)
+												openModal()
+											}}
+											className="inline-flex items-center mr-2 mb-1 rounded-md bg-pink-50 px-2 py-1 text-xs font-medium text-pink-700 ring-1 ring-inset ring-pink-700/10"
 										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-											/>
-										</svg>
-									</button>
-								)}
+											Delete
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												strokeWidth={1.5}
+												stroke="currentColor"
+												className="w-6 h-6"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+												/>
+											</svg>
+										</button>
+									)}
 							</div>
 						</div>
 					</li>
