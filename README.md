@@ -1,8 +1,53 @@
-# React + Vite
+# NC NEWS FRONT End
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### Introduction
 
-Currently, two official plugins are available:
+The app works like a news, articles or blogs page. Live-demo is can be found [here][prlink].
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The app is powered with REST API ([nc-news-backend]), handling all requests and data. [React.js] and [Tailwind.css] are used for fron-end part of the web page.
+
+### Requirements
+
+You will need the following installed to run this project.
+
+> -- [npm][npm]</br>
+> -- [React.js][react.js] >=18.2.0</br>
+
+### Installation
+
+You can fork or create a new branch from the main repository.
+
+```
+git clone https://github.com/sodikabdullaev/nc-news-fe
+```
+
+Once cloned in your local machine run:
+
+```
+npm install
+```
+
+## DEMO
+
+The database is stored in [ElephantSQL][esql] and the backend api is in [Render][rndr]
+
+The live demo is available [here][prl]
+
+## License
+
+MIT
+
+[//]: #
+[npm]: https://www.npmjs.com/
+[node]: https://nodejs.org/en
+[npl]: https://node-postgres.com/
+[psql]: https://www.postgresql.org/
+[jst]: https://jestjs.io/
+[stst]: https://www.npmjs.com/package/supertest
+[esql]: https://www.elephantsql.com
+[rndr]: https://render.com
+[prl]: https://nc-news-4wkm.onrender.com/api
+[nc-news-backend]: https://github.com/sodikabdullaev/nc-news
+[React.js]: https://react.dev/
+[Tailwind.css]: https://tailwindcss.com/
+[prlink]: https://nc-new-by.netlify.app
