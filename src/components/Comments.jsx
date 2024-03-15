@@ -49,14 +49,18 @@ function Comments({ article_id }) {
 				addComment(article_id, {
 					body: newComment,
 					author: activeUser.username,
-				}).then((data) => {
-					setComments((currValue) => {
-						return [data, ...currValue]
-					})
-					setIsCommenting(false)
-					setNewComment('')
-					setErrors([])
 				})
+					.then((data) => {
+						setComments((currValue) => {
+							return [data, ...currValue]
+						})
+						setIsCommenting(false)
+						setNewComment('')
+						setErrors([])
+					})
+					.catch((err) => {
+						setErrors[err.msg]
+					})
 			} else
 				setErrors([
 					`Please enter at least 5 characters to leave a comment`,

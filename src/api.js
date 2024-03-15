@@ -9,24 +9,44 @@ export function getArticles(queries) {
 	})
 }
 export function getArticleById(article_id) {
-	return newsApi.get(`/articles/${article_id}`).then(({ data }) => {
-		return data.article
-	})
+	return newsApi
+		.get(`/articles/${article_id}`)
+		.then(({ data }) => {
+			return data.article
+		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }
 export function getComments(article_id) {
-	return newsApi.get(`/articles/${article_id}/comments`).then(({ data }) => {
-		return data.comments
-	})
+	return newsApi
+		.get(`/articles/${article_id}/comments`)
+		.then(({ data }) => {
+			return data.comments
+		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }
 export function voteArticle(body, article_id) {
-	return newsApi.patch(`/articles/${article_id}`, body).then(({ data }) => {
-		return data.article
-	})
+	return newsApi
+		.patch(`/articles/${article_id}`, body)
+		.then(({ data }) => {
+			return data.article
+		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }
 export function getUsers() {
-	return newsApi.get('/users').then(({ data }) => {
-		return data.users
-	})
+	return newsApi
+		.get('/users')
+		.then(({ data }) => {
+			return data.users
+		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }
 export function addComment(article_id, comment) {
 	return newsApi
@@ -34,14 +54,27 @@ export function addComment(article_id, comment) {
 		.then(({ data }) => {
 			return data.comment
 		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }
 export function deleteComment(comment_id) {
-	return newsApi.delete(`/comments/${comment_id}`).then(() => {
-		return true
-	})
+	return newsApi
+		.delete(`/comments/${comment_id}`)
+		.then(() => {
+			return true
+		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }
 export function getTopics() {
-	return newsApi.get('/topics').then(({ data }) => {
-		return data.topics
-	})
+	return newsApi
+		.get('/topics')
+		.then(({ data }) => {
+			return data.topics
+		})
+		.catch((err) => {
+			return Promise.reject({ msg: err.response.data.msg })
+		})
 }

@@ -4,19 +4,30 @@ import { getArticles, getTopics } from '../api'
 import Breadcrumb from './Breadcrumb'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import Loading from './Loading'
+import NotFound from './NotFound'
 
 function ArticlesByTopic() {
 	const [selected, setSelected] = useState('')
 	const [topics, setTopics] = useState([])
 	const [isLoading, setIsLoading] = useState(false)
+	const [isError, setIsError] = useState(false)
 	const { topic } = useParams()
 	useEffect(() => {
 		setIsLoading(true)
-		getTopics().then((data) => {
-			setTopics(data)
-			setSelected(data.find((item) => item.slug === topic))
-			setIsLoading(false)
-		})
+		getTopics()
+			.then((data) => {
+				setTopics(data)
+				const matchingTopic = data.find((item) => item.slug === topic)
+				if (topic === undefined || matchingTopic === undefined)
+					setSelected(data[0])
+				else setSelected(matchingTopic)
+				setIsLoading(false)
+			})
+			.catch((err) => {
+				setIsError(true)
+				setIsLoading(false)
+			})
 	}, [])
 	const crumbs = [
 		{
@@ -28,7 +39,9 @@ function ArticlesByTopic() {
 			link: `/articles/${selected.slug}`,
 		},
 	]
-	if (isLoading) return <Loading />
+	if (isLoading) {
+		return <Loading />
+	} else if (isError) return <NotFound />
 	else
 		return (
 			<div className="bg-white py-4">
@@ -106,19 +119,39 @@ function ArticlesByTopic() {
 }
 function ArticlesList({ selected }) {
 	const [articles, setArticles] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const [isLoading, setIsLoading] = useState(false)
 
+	const months = [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec',
+	]
 	useEffect(() => {
+		setIsLoading(true)
 		getArticles({ topic: selected.slug }).then((data) => {
 			setArticles(data)
 			setIsLoading(false)
 		})
 	}, [selected])
+	function getFullDate(date) {
+		const commentedAt = new Date(date)
+		return `${commentedAt.getDate()} ${
+			months[commentedAt.getMonth()]
+		} ${commentedAt.getFullYear()}`
+	}
 	if (isLoading) return <Loading />
 	else
 		return (
 			<div className="mx-auto mt-2 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200  sm:mt-6 sm:pt-6 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-				{isLoading && <Loading />}
 				{articles.map((article) => (
 					<article
 						key={article.article_id}
@@ -136,7 +169,7 @@ function ArticlesList({ selected }) {
 								dateTime={article.created_at}
 								className="text-gray-500"
 							>
-								{article.created_at}
+								{getFullDate(article.created_at)}
 							</time>
 							<a
 								href={`/topics/${article.topic}`}
@@ -160,8 +193,5 @@ function ArticlesList({ selected }) {
 				))}
 			</div>
 		)
-}
-function Loading() {
-	return <h2>🌀 Loading...</h2>
 }
 export default ArticlesByTopic

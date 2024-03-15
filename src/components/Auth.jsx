@@ -46,32 +46,6 @@ function Auth() {
 						<Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 							<Menu.Item>
 								{({ active }) => (
-									<a
-										href="#"
-										className={classNames(
-											active ? 'bg-gray-100' : '',
-											'block px-4 py-2 text-sm text-gray-700'
-										)}
-									>
-										Your Profile
-									</a>
-								)}
-							</Menu.Item>
-							<Menu.Item>
-								{({ active }) => (
-									<a
-										href="#"
-										className={classNames(
-											active ? 'bg-gray-100' : '',
-											'block px-4 py-2 text-sm text-gray-700'
-										)}
-									>
-										Settings
-									</a>
-								)}
-							</Menu.Item>
-							<Menu.Item>
-								{({ active }) => (
 									<button
 										className={classNames(
 											active ? 'bg-gray-100' : '',
@@ -94,16 +68,23 @@ function Auth() {
 				<a
 					href="/users"
 					type="button"
-					className="text-sm font-medium  text-gray-200 hover:text-white px-2"
+					className="text-sm font-medium flex text-gray-200 hover:text-white px-2"
 				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						strokeWidth={1.5}
+						stroke="currentColor"
+						className="w-7 h-7 -mt-1"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+						/>
+					</svg>
 					Sign in
-				</a>
-				<span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-				<a
-					href="#"
-					className="text-sm font-medium text-gray-200 hover:text-white px-2"
-				>
-					Create account
 				</a>
 			</>
 		)

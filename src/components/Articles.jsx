@@ -4,6 +4,8 @@ import Breadcrumb from './Breadcrumb'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { useSearchParams } from 'react-router-dom'
+import Loading from './Loading'
+import NotFound from './NotFound'
 
 const crumbs = [
 	{
@@ -17,11 +19,24 @@ const sortByList = [
 	{ title: 'Topic', value: 'topic' },
 	{ title: 'Author', value: 'author' },
 ]
+const months = [
+	'Jan',
+	'Feb',
+	'Mar',
+	'Apr',
+	'May',
+	'Jun',
+	'Jul',
+	'Aug',
+	'Sep',
+	'Oct',
+	'Nov',
+	'Dec',
+]
 const orderByList = ['desc', 'asc']
 function Articles() {
 	const [selectedSort, setSelectedSort] = useState(sortByList[0])
 	const [selectedOrder, setSelectedOrder] = useState(orderByList[0])
-	const [isLoading, setIsLoading] = useState(false)
 
 	return (
 		<div className="bg-white py-4">
@@ -175,67 +190,77 @@ function Articles() {
 }
 function ArticlesList({ selectedSort, selectedOrder }) {
 	const [articles, setArticles] = useState([])
-	const [isLoading, setIsLoading] = useState(true)
+	const [isLoading, setIsLoading] = useState(false)
+	const [isError, setIsError] = useState(false)
 	let [searchParams, setSearchParams] = useSearchParams()
 
 	useEffect(() => {
-		console.log(selectedOrder)
-		getArticles({ sort_by: selectedSort.value, order: selectedOrder }).then(
-			(data) => {
+		setIsLoading(true)
+		getArticles({ sort_by: selectedSort.value, order: selectedOrder })
+			.then((data) => {
 				setArticles(data)
 				setIsLoading(false)
 				setSearchParams(
-					`order_by=${selectedSort.value}&order=${selectedOrder}`
+					`articles\/order_by=${selectedSort.value}&order=${selectedOrder}`
 				)
-			}
-		)
+			})
+			.catch((err) => {
+				setIsError(true)
+				setIsLoading(false)
+			})
 	}, [selectedSort, selectedOrder])
-	return (
-		<div className="mx-auto mt-2 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200  sm:mt-6 sm:pt-6 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-			{isLoading && <Loading />}
-			{articles.map((article) => (
-				<article
-					key={article.article_id}
-					className="flex max-w-xl flex-col items-start justify-between"
-				>
-					{' '}
-					<div className="items-center">
-						<img
-							className="rounded-lg"
-							src={article.article_img_url}
-						/>
-					</div>
-					<div className="flex items-center gap-x-4 text-xs">
-						<time
-							dateTime={article.created_at}
-							className="text-gray-500"
-						>
-							{article.created_at}
-						</time>
-						<a
-							href={`/topics/${article.topic}`}
-							className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-						>
-							{article.topic}
-						</a>
-					</div>
-					<div className="group relative">
-						<h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-							<a href={`/articles/${article.article_id}`}>
-								<span className="absolute inset-0" />
-								{article.title}
+	function getFullDate(date) {
+		const commentedAt = new Date(date)
+		return `${commentedAt.getDate()} ${
+			months[commentedAt.getMonth()]
+		} ${commentedAt.getFullYear()}`
+	}
+	if (isLoading) {
+		return <Loading />
+	} else if (isError) return <NotFound />
+	else
+		return (
+			<div className="mx-auto mt-2 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200  sm:mt-6 sm:pt-6 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+				{articles.map((article) => (
+					<article
+						key={article.article_id}
+						className="flex max-w-xl flex-col items-start justify-between"
+					>
+						{' '}
+						<div className="items-center">
+							<img
+								className="rounded-lg"
+								src={article.article_img_url}
+							/>
+						</div>
+						<div className="flex items-center gap-x-4 text-xs">
+							<time
+								dateTime={article.created_at}
+								className="text-gray-500"
+							>
+								{getFullDate(article.created_at)}
+							</time>
+							<a
+								href={`/topics/${article.topic}`}
+								className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
+							>
+								{article.topic}
 							</a>
-						</h3>
-						<p className="text-gray-600">
-							Author: <a href="#">{article.author}</a>
-						</p>
-					</div>
-				</article>
-			))}
-		</div>
-	)
-}
-function Loading() {
-	return <h2>🌀 Loading...</h2>
+						</div>
+						<div className="group relative">
+							<h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+								<a href={`/articles/${article.article_id}`}>
+									<span className="absolute inset-0" />
+									{article.title}
+								</a>
+							</h3>
+							<p className="text-gray-600">
+								Author: <a href="#">{article.author}</a>
+							</p>
+						</div>
+					</article>
+				))}
+			</div>
+		)
 }
 export default Articles
